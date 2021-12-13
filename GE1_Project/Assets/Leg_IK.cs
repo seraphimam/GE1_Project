@@ -21,10 +21,17 @@ public class Leg_IK : MonoBehaviour
     public float full_len; //full length of leg
     public Vector3[] pos; //positions for each bone
 
+    public Vector3 org_pos;
+
+    public bool isMoving;
+
     // Start is called before the first frame update
     void Start()
     {
         IK_Init();
+
+        isMoving = false;
+        Vector3 org_pos = move_dir.position;
     }
 
     void IK_Init()
@@ -57,6 +64,8 @@ public class Leg_IK : MonoBehaviour
     {
         IK_run();
 
+        isMoving = false;
+        
         move();
     }
 
@@ -138,13 +147,48 @@ public class Leg_IK : MonoBehaviour
     void move()
     {
         Transform leg = GameObject.Find("Leg").transform;
+        Transform knee = GameObject.Find("Knee").transform;
+        Transform foot = GameObject.Find("Foot").transform;
+        
 
         //move forward
         if (Input.GetKey(KeyCode.W))
         {
-            if(bones[1].position.y >= (move_dir.position.y * 0.9) && bones[1].position.y <= (move_dir.position.y * 1.1))
-            {
+            isMoving = true;
 
+            //if (isMoving)
+            //{
+            //    Debug.Log("knee x: " + knee.position.x);
+            //    Debug.Log("knee z: " + knee.position.x);
+            //    Debug.Log("foot x: " + foot.position.x);
+            //    Debug.Log("foot z: " + foot.position.x);
+            //    Debug.Log("Next!");
+            //}
+
+            if((knee.position - move_dir.position).sqrMagnitude <= 0.25)
+            {
+                if(Mathf.Abs(foot.position.x - org_pos.x) <= 0.25 && Mathf.Abs(foot.position.z - org_pos.z) <= 0.25)
+                {
+                    if (Mathf.Abs(leg.position.x - org_pos.x) <= 0.25 && Mathf.Abs(leg.position.z - org_pos.z) <= 0.25)
+                    {
+                        if (target.position.y > 0)
+                        {
+                            target.position += target.up * -speed * Time.deltaTime;
+                        }
+                        
+                    }
+                    else
+                    {
+                        leg.position += leg.forward * speed * Time.deltaTime;
+                        move_dir.position += move_dir.forward * speed * Time.deltaTime;
+                    }
+                    
+                }
+                else
+                {
+                    target.position += target.forward * speed * Time.deltaTime;
+                }
+                    
             }
             else
             {
@@ -152,12 +196,12 @@ public class Leg_IK : MonoBehaviour
                 target.position += target.up * speed * Time.deltaTime;
             }
             
-        }
+        }//end moveforward if
 
         if (Input.GetKey(KeyCode.S))
         {
             target.position += target.forward * -speed * Time.deltaTime;
-            target.position += target.up * -speed * Time.deltaTime;
+            //target.position += target.up * -speed * Time.deltaTime;
         }
 
         if (Input.GetKey(KeyCode.A))
