@@ -32,11 +32,20 @@ public class Leg_IK : MonoBehaviour
     public Transform knee;
     public Transform foot;
 
+    
+    public Transform knee_bone;
+
     // Start is called before the first frame update
     void Start()
     {
-        target = GameObject.Find("Foot_ctrl").transform;
-        move_dir = GameObject.Find("Foot_dir").transform;
+        target = GameObject.Find("R_Foot_ctrl").transform;
+        move_dir = GameObject.Find("R_Foot_dir").transform;
+        leg = GameObject.Find("Leg_R").transform;
+        knee = GameObject.Find("Knee_R").transform;
+        foot = GameObject.Find("Foot_R").transform;
+
+        //leg.LookAt(knee);
+        //knee.LookAt(foot);
         knee_forward = false;
         foot_forward = false;
         foot_down = false;
@@ -44,9 +53,11 @@ public class Leg_IK : MonoBehaviour
 
         isMoving = false;
         org_pos = move_dir.position;
-        Debug.Log("org x: " + org_pos.x);
-        Debug.Log("org y: " + org_pos.y);
-        Debug.Log("org z: " + org_pos.z);
+
+        
+        //Debug.Log("org x: " + org_pos.x);
+        //Debug.Log("org y: " + org_pos.y);
+        //Debug.Log("org z: " + org_pos.z);
     }
 
     void IK_Init()
@@ -76,6 +87,8 @@ public class Leg_IK : MonoBehaviour
     void Update()
     {
         IK_run();
+        //leg.LookAt(knee);
+        //knee.LookAt(foot);
 
         isMoving = false;
         
@@ -159,9 +172,7 @@ public class Leg_IK : MonoBehaviour
 
     void move()
     {
-        leg = GameObject.Find("Leg").transform;
-        knee = GameObject.Find("Knee").transform;
-        foot = GameObject.Find("Foot").transform;
+        
         
 
         //move forward
@@ -176,7 +187,7 @@ public class Leg_IK : MonoBehaviour
                     if (! (Mathf.Abs(leg.position.x - org_pos.x) <= 0.25 && Mathf.Abs(leg.position.z - org_pos.z) <= 0.25))
                     {
                         foot_down = true;
-                        Debug.Log("foot down");
+                        //Debug.Log("foot down");
                     }
 
                 }//foot move forward when knee reaches high point
@@ -196,7 +207,7 @@ public class Leg_IK : MonoBehaviour
                 {
                     foot_down = false;
                     org_pos = move_dir.position;
-                    Debug.Log("End Foot Down");
+                    //Debug.Log("End Foot Down");
                 }
             }
 
