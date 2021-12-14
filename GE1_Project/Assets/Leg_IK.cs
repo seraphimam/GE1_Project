@@ -24,20 +24,33 @@ public class Leg_IK : MonoBehaviour
     public Vector3 org_pos;
 
     public bool isMoving;
+    public bool knee_forward;
+    public bool foot_forward;
+    public bool foot_down;
+
+    public Transform leg;
+    public Transform knee;
+    public Transform foot;
 
     // Start is called before the first frame update
     void Start()
     {
+        target = GameObject.Find("Foot_ctrl").transform;
+        move_dir = GameObject.Find("Foot_dir").transform;
+        knee_forward = false;
+        foot_forward = false;
+        foot_down = false;
         IK_Init();
 
         isMoving = false;
-        Vector3 org_pos = move_dir.position;
+        org_pos = move_dir.position;
+        Debug.Log("org x: " + org_pos.x);
+        Debug.Log("org y: " + org_pos.y);
+        Debug.Log("org z: " + org_pos.z);
     }
 
     void IK_Init()
     {
-        target = GameObject.Find("Foot_ctrl").transform;
-        move_dir = GameObject.Find("Foot_dir").transform;
         bones = new Transform[max_len + 1];
         pos = new Vector3[max_len + 1];
         bone_length = new float[max_len];
@@ -127,7 +140,7 @@ public class Leg_IK : MonoBehaviour
             }
         }
 
-        for(int i = 1; i < pos.Length - 1; i++)
+        for (int i = 1; i < pos.Length - 1; i++)
         {
             var plane = new Plane(pos[i + 1] - pos[i - 1], pos[i - 1]);
             var projection_angle = plane.ClosestPointOnPlane(move_dir.position);
@@ -146,56 +159,51 @@ public class Leg_IK : MonoBehaviour
 
     void move()
     {
-        Transform leg = GameObject.Find("Leg").transform;
-        Transform knee = GameObject.Find("Knee").transform;
-        Transform foot = GameObject.Find("Foot").transform;
+        leg = GameObject.Find("Leg").transform;
+        knee = GameObject.Find("Knee").transform;
+        foot = GameObject.Find("Foot").transform;
         
 
         //move forward
         if (Input.GetKey(KeyCode.W))
         {
-            isMoving = true;
-
-            //if (isMoving)
-            //{
-            //    Debug.Log("knee x: " + knee.position.x);
-            //    Debug.Log("knee z: " + knee.position.x);
-            //    Debug.Log("foot x: " + foot.position.x);
-            //    Debug.Log("foot z: " + foot.position.x);
-            //    Debug.Log("Next!");
-            //}
-
-            if((knee.position - move_dir.position).sqrMagnitude <= 0.25)
+            if ((knee.position - move_dir.position).sqrMagnitude <= 0.25)
             {
-                if(Mathf.Abs(foot.position.x - org_pos.x) <= 0.25 && Mathf.Abs(foot.position.z - org_pos.z) <= 0.25)
+                knee_forward = false;
+                if (Mathf.Abs(target.position.x - org_pos.x) <= 0.25 && Mathf.Abs(target.position.z - org_pos.z) <= 0.25)
                 {
-                    if (Mathf.Abs(leg.position.x - org_pos.x) <= 0.25 && Mathf.Abs(leg.position.z - org_pos.z) <= 0.25)
+                    foot_forward = false;
+                    if (! (Mathf.Abs(leg.position.x - org_pos.x) <= 0.25 && Mathf.Abs(leg.position.z - org_pos.z) <= 0.25))
                     {
-                        if (target.position.y > 0)
-                        {
-                            target.position += target.up * -speed * Time.deltaTime;
-                        }
-                        
+                        foot_down = true;
+                        Debug.Log("foot down");
                     }
-                    else
-                    {
-                        leg.position += leg.forward * speed * Time.deltaTime;
-                        move_dir.position += move_dir.forward * speed * Time.deltaTime;
-                    }
-                    
-                }
+
+                }//foot move forward when knee reaches high point
                 else
                 {
-                    target.position += target.forward * speed * Time.deltaTime;
+                    foot_forward = true;
                 }
-                    
-            }
+            }//knee move forward first
             else
             {
-                target.position += target.forward * speed * Time.deltaTime;
-                target.position += target.up * speed * Time.deltaTime;
+                knee_forward = true;
             }
+
+            if (foot_down)
+            {
+                if (target.position.y <= 0.5)
+                {
+                    foot_down = false;
+                    org_pos = move_dir.position;
+                    Debug.Log("End Foot Down");
+                }
+            }
+
             
+
+
+            move_forward();
         }//end moveforward if
 
         if (Input.GetKey(KeyCode.S))
@@ -214,4 +222,61 @@ public class Leg_IK : MonoBehaviour
             target.position += target.right * speed * Time.deltaTime;
         }
     }// end move()
+
+    void move_forward()
+    {
+        isMoving = true;
+
+        if (foot_down)
+        {
+            knee_forward = false;
+            foot_forward = false;
+        }
+
+        if (knee_forward)
+        {
+            //Debug.Log("knee forward + foot");
+            target.position += target.forward * speed * Time.deltaTime;
+            target.position += target.up * speed * Time.deltaTime;
+        }
+
+        if (foot_forward)
+        {
+            //Debug.Log("Foot Forward only");
+            target.position += target.forward * speed * Time.deltaTime;
+        }
+
+        if (foot_down)
+        {
+            //Debug.Log("foot down");
+            target.position += target.forward * -speed * Time.deltaTime;
+            target.position += target.up * -speed * Time.deltaTime;
+            leg.position += leg.forward * speed * Time.deltaTime;
+            move_dir.position += move_dir.forward * speed * Time.deltaTime;
+
+            //Debug.Log("org x: " + org_pos.x);
+            //Debug.Log("org y: " + org_pos.y);
+            //Debug.Log("org z: " + org_pos.z);
+        }
+
+        //Debug.Log("org x: " + org_pos.x);
+        //Debug.Log("org y: " + org_pos.y);
+        //Debug.Log("org z: " + org_pos.z);
+
+
+
+
+        //if (target.position.y > 0)
+        //{
+        //    target.position += target.up * -speed * Time.deltaTime;
+        //}
+        //else
+        //{
+
+        //}
+
+        //leg.position += leg.forward * speed * Time.deltaTime;
+        //move_dir.position += move_dir.forward * speed * Time.deltaTime;
+
+    }// end move_forward()
 }
