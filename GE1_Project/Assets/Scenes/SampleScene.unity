@@ -135,6 +135,7 @@ GameObject:
   - component: {fileID: 163831325}
   - component: {fileID: 163831324}
   - component: {fileID: 163831323}
+  - component: {fileID: 163831327}
   m_Layer: 0
   m_Name: Pelvis
   m_TagString: Untagged
@@ -213,13 +214,46 @@ Transform:
   m_GameObject: {fileID: 163831322}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 1, y: 5, z: 0}
-  m_LocalScale: {x: 2, y: 2, z: 1}
+  m_LocalScale: {x: 3, y: 2, z: 1}
   m_Children:
   - {fileID: 1016534823}
   - {fileID: 1138016906}
   m_Father: {fileID: 0}
   m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &163831327
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 163831322}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a7c4810c106b9c543bea114040434b1e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  speed: 5
+  right_control: {fileID: 0}
+  right_dir: {fileID: 0}
+  left_control: {fileID: 0}
+  left_dir: {fileID: 0}
+  org_pos_r: {x: 0, y: 0, z: 0}
+  org_pos_l: {x: 0, y: 0, z: 0}
+  isMoving: 0
+  right_leg_in_front: 0
+  right_knee_forward: 0
+  right_foot_forward: 0
+  right_foot_down: 0
+  left_knee_forward: 0
+  left_foot_forward: 0
+  left_foot_down: 0
+  right_leg: {fileID: 0}
+  right_knee: {fileID: 0}
+  right_foot: {fileID: 0}
+  left_leg: {fileID: 0}
+  left_knee: {fileID: 0}
+  left_foot: {fileID: 0}
 --- !u!1 &542189453
 GameObject:
   m_ObjectHideFlags: 0
@@ -451,13 +485,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 840150479}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 966d930135d7a2f4da7f29bd79d2d44a, type: 3}
+  m_Script: {fileID: 11500000, guid: 5f5f93c64cbd21f41869491f13500b4d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   max_len: 2
-  speed: 5
-  target: {fileID: 0}
-  move_dir: {fileID: 0}
   iter: 10
   delta: 0.001
   backwards_Str: 1
@@ -465,15 +496,9 @@ MonoBehaviour:
   bone_length: []
   full_len: 0
   pos: []
-  org_pos: {x: 0, y: 0, z: 0}
-  isMoving: 0
-  knee_forward: 0
-  foot_forward: 0
-  foot_down: 0
-  leg: {fileID: 0}
-  knee: {fileID: 0}
-  foot: {fileID: 0}
-  knee_bone: {fileID: 0}
+  right_control: {fileID: 0}
+  right_dir: {fileID: 0}
+  right_foot: {fileID: 0}
 --- !u!65 &840150482
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -548,7 +573,6 @@ GameObject:
   - component: {fileID: 932349691}
   - component: {fileID: 932349690}
   - component: {fileID: 932349689}
-  - component: {fileID: 932349688}
   m_Layer: 0
   m_Name: Knee_L
   m_TagString: Untagged
@@ -571,21 +595,6 @@ Transform:
   m_Father: {fileID: 1138016906}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &932349688
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 932349686}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 443c0936d64a6684485f7939e1bd4526, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  knee_bone: {fileID: 0}
-  foot: {fileID: 0}
-  knee: {fileID: 0}
 --- !u!65 &932349689
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -754,7 +763,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 946556540}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 443c0936d64a6684485f7939e1bd4526, type: 3}
+  m_Script: {fileID: 11500000, guid: 0e1884a94a88c974ea722891c83a9f68, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   knee_bone: {fileID: 0}
@@ -933,8 +942,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1016534819}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.5, y: -0.25, z: 0}
-  m_LocalScale: {x: 0.5, y: 0.5, z: 1}
+  m_LocalPosition: {x: -0.33333334, y: -0.25, z: 0}
+  m_LocalScale: {x: 0.33333334, y: 0.5, z: 1}
   m_Children:
   - {fileID: 946556541}
   m_Father: {fileID: 163831326}
@@ -949,7 +958,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1016534819}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f927c9c57efef5c44bd1d5513366a1e1, type: 3}
+  m_Script: {fileID: 11500000, guid: 7dc1bd5f91e812f49b8476b633374e9e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   leg_bone: {fileID: 0}
@@ -967,7 +976,6 @@ GameObject:
   - component: {fileID: 1138016905}
   - component: {fileID: 1138016904}
   - component: {fileID: 1138016903}
-  - component: {fileID: 1138016902}
   m_Layer: 0
   m_Name: Leg_L
   m_TagString: Untagged
@@ -975,21 +983,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1138016902
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1138016901}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f927c9c57efef5c44bd1d5513366a1e1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  leg_bone: {fileID: 0}
-  leg: {fileID: 0}
-  knee: {fileID: 0}
 --- !u!65 &1138016903
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1060,8 +1053,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1138016901}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.5, y: -0.25, z: 0}
-  m_LocalScale: {x: 0.5, y: 0.5, z: 1}
+  m_LocalPosition: {x: 0.33333334, y: -0.25, z: 0}
+  m_LocalScale: {x: 0.33333334, y: 0.5, z: 1}
   m_Children:
   - {fileID: 932349687}
   m_Father: {fileID: 163831326}
@@ -1460,7 +1453,6 @@ GameObject:
   - component: {fileID: 1658977290}
   - component: {fileID: 1658977289}
   - component: {fileID: 1658977288}
-  - component: {fileID: 1658977287}
   m_Layer: 0
   m_Name: Foot_L
   m_TagString: Untagged
@@ -1482,38 +1474,6 @@ Transform:
   m_Father: {fileID: 932349687}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1658977287
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1658977285}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 966d930135d7a2f4da7f29bd79d2d44a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  max_len: 2
-  speed: 5
-  target: {fileID: 0}
-  move_dir: {fileID: 0}
-  iter: 10
-  delta: 0.001
-  backwards_Str: 1
-  bones: []
-  bone_length: []
-  full_len: 0
-  pos: []
-  org_pos: {x: 0, y: 0, z: 0}
-  isMoving: 0
-  knee_forward: 0
-  foot_forward: 0
-  foot_down: 0
-  leg: {fileID: 0}
-  knee: {fileID: 0}
-  foot: {fileID: 0}
-  knee_bone: {fileID: 0}
 --- !u!65 &1658977288
 BoxCollider:
   m_ObjectHideFlags: 0
