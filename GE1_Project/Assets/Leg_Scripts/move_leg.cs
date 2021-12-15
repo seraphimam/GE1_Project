@@ -14,7 +14,8 @@ public class move_leg : MonoBehaviour
     public Vector3 org_pos_r;
     public Vector3 org_pos_l;
 
-    public bool isMoving;
+    public bool is_moving_right_leg;
+    public bool is_moving_left_leg;
 
     public bool right_leg_in_front;
 
@@ -75,7 +76,8 @@ public class move_leg : MonoBehaviour
         left_foot_forward = false;
         left_foot_down = false;
 
-        isMoving = false;
+        is_moving_right_leg = false;
+        is_moving_left_leg = false;
 
         org_pos_r = right_dir.position;
         org_pos_l = left_dir.position;
@@ -89,8 +91,6 @@ public class move_leg : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        isMoving = false;
-
         move();
     }
 
@@ -99,8 +99,9 @@ public class move_leg : MonoBehaviour
         //move forward
         if (Input.GetKey(KeyCode.W))
         {
-            if (right_leg_in_front)
+            if (right_leg_in_front || is_moving_left_leg)
             {
+                
                 left_leg_forward();
                 
                 pelvis_dir.transform.position = right_dir.position + pelvis_height_adj;
@@ -110,10 +111,13 @@ public class move_leg : MonoBehaviour
                 pelvis.position = left_leg.position - (between_legs / 2.0f);
 
                 pelvis.LookAt(pelvis_dir.transform);
-                
+
+                is_moving_left_leg = true;
+
             }
             else
             {
+                
                 right_leg_forward();
                 
                 pelvis_dir.transform.position = left_dir.position + pelvis_height_adj;
@@ -123,22 +127,30 @@ public class move_leg : MonoBehaviour
                 pelvis.position = right_leg.position - (between_legs / 2.0f);
 
                 pelvis.LookAt(pelvis_dir.transform);
-                
+
+                is_moving_right_leg = true;
+
             }
 
-
+            //Debug.Log("forward left moving: " + is_moving_left_leg);
+            //Debug.Log("forward right moving: " + is_moving_right_leg);
         }//end moveforward if
 
         // move backwards
         if (Input.GetKey(KeyCode.S))
         {
-            if (right_leg_in_front)
+            //Debug.Log("left moving: " + is_moving_left_leg);
+            //Debug.Log("right moving: " + is_moving_right_leg);
+
+            if (right_leg_in_front || is_moving_right_leg)
             {
                 right_leg_backwards();
+                is_moving_right_leg = true;
             }
             else
             {
                 left_leg_backwards();
+                is_moving_left_leg = true;
             }
             //right_control.position += right_control.forward * -speed * Time.deltaTime;
             //right_control.position += right_control.up * -speed * Time.deltaTime;
@@ -157,8 +169,6 @@ public class move_leg : MonoBehaviour
 
     void move_forward_right()
     {
-        isMoving = true;
-
         if (right_foot_down)
         {
             right_knee_forward = false;
@@ -225,6 +235,7 @@ public class move_leg : MonoBehaviour
                 right_foot_down = false;
                 org_pos_r = right_dir.position;
                 right_leg_in_front = true;
+                is_moving_right_leg = false;
                 //Debug.Log("End Foot Down");
             }
         }
@@ -236,7 +247,6 @@ public class move_leg : MonoBehaviour
     //move_left
     void move_forward_left()
     {
-        isMoving = true;
 
         if (left_foot_down)
         {
@@ -301,6 +311,7 @@ public class move_leg : MonoBehaviour
                 left_foot_down = false;
                 org_pos_l = left_dir.position;
                 right_leg_in_front = false;
+                is_moving_left_leg = false;
                 //Debug.Log("End Foot Down");
             }
         }
@@ -316,7 +327,7 @@ public class move_leg : MonoBehaviour
         //Debug.Log("knee dist: " + knee_leg_dist);
         if(dist > knee_leg_dist / 3.0f)
         {
-            //right_control.position += right_control.up * -speed * Time.deltaTime;
+            right_control.position += right_control.up * -speed * Time.deltaTime;
             right_control.position += right_control.forward * -speed * Time.deltaTime;
         }//move foot upwards
         else
