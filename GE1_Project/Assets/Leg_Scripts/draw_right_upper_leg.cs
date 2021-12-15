@@ -7,6 +7,9 @@ public class draw_right_upper_leg : MonoBehaviour
     public GameObject leg_bone;
     public Transform leg;
     public Transform knee;
+
+    public Vector3 mid;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -27,7 +30,7 @@ public class draw_right_upper_leg : MonoBehaviour
     void Update()
     {
         leg_bone.transform.position = leg.position;
-        Vector3 mid = leg.position - knee.position;
+        mid = leg.position - knee.position;
         leg_bone.transform.position = leg.position - (mid / 2.0f);
         leg_bone.transform.LookAt(knee);
     }

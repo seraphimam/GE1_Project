@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class move_leg : MonoBehaviour
 {
-    public float speed = 5.0f;
+    public float speed = 2.0f;
 
     public Transform right_control;
     public Transform right_dir;
@@ -34,6 +34,18 @@ public class move_leg : MonoBehaviour
     public Transform left_knee;
     public Transform left_foot;
 
+    public Transform pelvis;
+
+    public Vector3 pelvis_height_adj;
+    public GameObject pelvis_dir;
+
+    public Vector3 between_legs;
+
+    public Vector3 right_foot_org;
+    public Vector3 left_foot_org;
+
+    public float knee_leg_dist;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -49,6 +61,10 @@ public class move_leg : MonoBehaviour
         left_knee = GameObject.Find("Knee_L").transform;
         left_foot = GameObject.Find("Foot_L").transform;
 
+        pelvis = GameObject.Find("Pelvis").transform;
+        pelvis_dir = new GameObject();
+        pelvis_height_adj = new Vector3(0f, 1.5f, 0f);
+
         right_leg_in_front = false;
 
         right_knee_forward = false;
@@ -63,6 +79,11 @@ public class move_leg : MonoBehaviour
 
         org_pos_r = right_dir.position;
         org_pos_l = left_dir.position;
+
+        right_foot_org = right_control.position;
+        left_foot_org = left_control.position;
+
+        knee_leg_dist = (right_knee.position - right_foot.position).magnitude;
     }
 
     // Update is called once per frame
@@ -81,20 +102,47 @@ public class move_leg : MonoBehaviour
             if (right_leg_in_front)
             {
                 left_leg_forward();
+                
+                pelvis_dir.transform.position = right_dir.position + pelvis_height_adj;
+
+                between_legs = left_leg.position - right_leg.position;
+
+                pelvis.position = left_leg.position - (between_legs / 2.0f);
+
+                pelvis.LookAt(pelvis_dir.transform);
+                
             }
             else
             {
                 right_leg_forward();
+                
+                pelvis_dir.transform.position = left_dir.position + pelvis_height_adj;
+
+                between_legs = right_leg.position - left_leg.position;
+
+                pelvis.position = right_leg.position - (between_legs / 2.0f);
+
+                pelvis.LookAt(pelvis_dir.transform);
+                
             }
 
 
         }//end moveforward if
 
+        // move backwards
         if (Input.GetKey(KeyCode.S))
         {
-            right_control.position += right_control.forward * -speed * Time.deltaTime;
+            if (right_leg_in_front)
+            {
+                right_leg_backwards();
+            }
+            else
+            {
+                left_leg_backwards();
+            }
+            //right_control.position += right_control.forward * -speed * Time.deltaTime;
             //right_control.position += right_control.up * -speed * Time.deltaTime;
-        }
+        }//end move backwards if
 
         if (Input.GetKey(KeyCode.A))
         {
@@ -176,6 +224,7 @@ public class move_leg : MonoBehaviour
             {
                 right_foot_down = false;
                 org_pos_r = right_dir.position;
+                right_leg_in_front = true;
                 //Debug.Log("End Foot Down");
             }
         }
@@ -251,6 +300,7 @@ public class move_leg : MonoBehaviour
             {
                 left_foot_down = false;
                 org_pos_l = left_dir.position;
+                right_leg_in_front = false;
                 //Debug.Log("End Foot Down");
             }
         }
@@ -258,4 +308,40 @@ public class move_leg : MonoBehaviour
 
         move_forward_left();
     }// end right_leg_forward()
+
+    void right_leg_backwards()
+    {
+        float dist = (right_foot.position - right_foot_org).magnitude;
+        //Debug.Log("dist: " + dist);
+        //Debug.Log("knee dist: " + knee_leg_dist);
+        if(dist > knee_leg_dist / 3.0f)
+        {
+            //right_control.position += right_control.up * -speed * Time.deltaTime;
+            right_control.position += right_control.forward * -speed * Time.deltaTime;
+        }//move foot upwards
+        else
+        {
+            right_control.position += right_control.up * speed * Time.deltaTime;
+            left_control.position += left_control.forward * -speed * 0.5f * Time.deltaTime;
+            //right_foot.position = right_control.position;
+        }
+    }// end right_leg_backwards()
+
+    void left_leg_backwards()
+    {
+        float dist = (left_foot.position - left_foot_org).magnitude;
+        //Debug.Log("dist: " + dist);
+        //Debug.Log("knee dist: " + knee_leg_dist);
+        if (dist > knee_leg_dist / 3.0f)
+        {
+            left_control.position += left_control.up * -speed * Time.deltaTime;
+            left_control.position += left_control.forward * -speed * Time.deltaTime;
+        }//move foot upwards
+        else
+        {
+            left_control.position += left_control.up * speed * Time.deltaTime;
+            left_control.position += left_control.forward * -speed * 0.5f * Time.deltaTime;
+            //left_foot.position = left_control.position;
+        }
+    }// end left_leg_backwards
 }
