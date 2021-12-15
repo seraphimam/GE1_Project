@@ -131,7 +131,13 @@ public class move_leg : MonoBehaviour
             {
                 //Debug.Log("angle: " + left_leg.localRotation.eulerAngles.y);
                 //Debug.Log("init: " + init_rotation);
-                if (Input.GetKeyUp(KeyCode.A) || Mathf.Abs(Mathf.Abs(left_leg.localRotation.eulerAngles.y) - Mathf.Abs(init_rotation)) >= 30.0f || fin_left)
+                float left_angle = left_leg.localRotation.eulerAngles.y;
+                if(init_rotation >= 330)
+                {
+                    left_angle += 360;
+                }
+
+                if (Input.GetKeyUp(KeyCode.A) || Mathf.Abs(left_angle - init_rotation) >= 30.0f || fin_left)
                 {
                     fin_left = true;
                     finish_left_turn();
@@ -145,7 +151,24 @@ public class move_leg : MonoBehaviour
 
             if (is_turning_right)
             {
+                //Debug.Log("angle: " + right_leg.localRotation.eulerAngles.y);
+                //Debug.Log("init: " + init_rotation);
+                float right_angle = right_leg.localRotation.eulerAngles.y;
+                if (init_rotation <= 30)
+                {
+                    right_angle -= 360;
+                }
 
+                if (Input.GetKeyUp(KeyCode.D) || Mathf.Abs(init_rotation - right_angle) >= 30.0f || fin_right)
+                {
+                    //Debug.Log("fin");
+                    fin_right = true;
+                    finish_right_turn();
+                }
+                else
+                {
+                    turn_right();
+                }
             }
         }
 
@@ -217,15 +240,6 @@ public class move_leg : MonoBehaviour
             {
                 if (is_moving_right_leg)
                 {
-                    //if (Mathf.Abs(right_control.position.x - right_dir_org.x) <= 0.25 && Mathf.Abs(right_control.position.z - right_dir_org.z) <= 0.25)
-                    //{
-                    //    right_control.position += right_control.up * -speed * Time.deltaTime;
-                    //}
-                    //else
-                    //{
-                    //    right_leg.position += right_leg.forward * speed * Time.deltaTime;
-                    //}
-
                     right_control.position += right_control.up * -speed * Time.deltaTime;
 
                     if (right_control.position.y <= 0.5)
@@ -236,6 +250,7 @@ public class move_leg : MonoBehaviour
                 else if (is_moving_left_leg)
                 {
                     left_control.position += left_control.up * -speed * Time.deltaTime;
+
                     if (left_control.position.y <= 0.5)
                     {
                         is_moving_left_leg = false;
@@ -243,12 +258,45 @@ public class move_leg : MonoBehaviour
                 }
                 
             }
-        }
+        }//end turn left (A)
 
         if (Input.GetKey(KeyCode.D))
         {
-            right_control.position += right_control.right * speed * Time.deltaTime;
-        }
+            //Debug.Log("DDDD");
+            if (!is_moving_right_leg && !is_moving_left_leg)
+            {
+                //Debug.Log("not moving");
+                if (!is_turning_right)
+                {
+                    init_rotation = right_leg.localRotation.eulerAngles.y;
+                }
+
+                turn_right();
+            }
+            else
+            {
+                //Debug.Log("else");
+                if (is_moving_right_leg)
+                {
+                    right_control.position += right_control.up * -speed * Time.deltaTime;
+
+                    if (right_control.position.y <= 0.5)
+                    {
+                        is_moving_right_leg = false;
+                    }
+                }
+                else if (is_moving_left_leg)
+                {
+                    left_control.position += left_control.up * -speed * Time.deltaTime;
+
+                    if (left_control.position.y <= 0.5)
+                    {
+                        is_moving_left_leg = false;
+                    }
+                }
+
+            }
+        }//end turn right(D)
     }// end move()
 
     void move_forward_right()
@@ -594,7 +642,72 @@ public class move_leg : MonoBehaviour
         //        right_control.position += right_control.up * speed * Time.deltaTime;
         //    }
         //}
+    }//end finish_left_turn()
+
+    //turn right
+    void turn_right()
+    {
+        //Debug.Log("right");
+        is_turning_right = true;
+
+        right_dir.parent = right_leg;
+        //right_dir.parent = right_leg;
+
+        right_control.parent = right_foot;
+        //right_control.parent = right_foot;
+
+        right_leg.Rotate(0, -rotate_speed * Time.deltaTime, 0);
+        //right_leg.Rotate(Vector3.up, rotate_speed * Time.deltaTime);
+
     }
+
+    void finish_right_turn()
+    {
+        //Debug.Log("finishing right turn");
+
+        if (is_turning_right)
+        {
+            //is_turning_left = false;
+
+            right_dir.parent = null;
+            //right_dir.parent = null;
+
+            right_control.parent = null;
+            //right_control.parent = null;
+        }
+
+        //swing leg
+        float angle = Vector3.SignedAngle(left_leg.position - right_leg.position, right_leg.forward, Vector3.up);
+
+        left_knee.parent = null;
+        left_foot.parent = null;
+
+        if (Mathf.Abs(angle) >= 89.9 && Mathf.Abs(angle) <= 90.1)
+        //if (Mathf.Abs(angle) == 90.0f)
+        {
+            left_knee.parent = left_leg;
+            left_foot.parent = left_knee;
+            //Debug.Log("dist: " + (right_leg.position - right_dir.position).magnitude);
+            right_foot_org = right_control.position;
+            right_dir_org = right_dir.position;
+            fin_right = false;
+            is_turning_right = false;
+
+            left_foot_org = left_control.position;
+            left_dir_org = left_dir.position;
+            right_leg_in_front = false;
+
+        }
+        else
+        {
+            //Debug.Log("swing left leg");
+            left_leg.RotateAround(right_leg.position, Vector3.up, rotate_speed * Time.deltaTime);
+            left_knee.RotateAround(right_knee.position, Vector3.up, rotate_speed * Time.deltaTime);
+            left_foot.RotateAround(right_foot.position, Vector3.up, rotate_speed * Time.deltaTime);
+            left_control.RotateAround(right_control.position, Vector3.up, rotate_speed * Time.deltaTime);
+            left_dir.RotateAround(right_leg.position, Vector3.up, rotate_speed * Time.deltaTime);
+        }
+    }//end finish_right_turn()
 
     //void dist_correction()
     //{
