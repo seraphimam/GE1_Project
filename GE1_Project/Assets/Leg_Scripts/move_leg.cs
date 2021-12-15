@@ -134,14 +134,15 @@ public class move_leg : MonoBehaviour
         left_offset = new Vector3(0, 0, 0);
         right_offset = new Vector3(0, 0, 0);
 
-        //Debug.Log("start dist: " + (right_leg.position - right_dir.position).magnitude);
+        //Debug.Log("start dist: " + (right_leg.position - left_leg.position).magnitude);
     }
 
     // Update is called once per frame
     void Update()
     {
+        //Debug.Log("dist: " + (right_leg.position - left_leg.position).magnitude);
         //Debug.Log("mf: " + is_moving_forward);
-        if(!is_turning_left && !is_turning_right && !is_moving_backwards && !is_moving_forward)
+        if (!is_turning_left && !is_turning_right && !is_moving_backwards && !is_moving_forward)
         {
             move();
         }
@@ -643,12 +644,14 @@ public class move_leg : MonoBehaviour
         }
 
         //swing leg
-        float angle = Vector3.SignedAngle(right_leg.position - left_leg.position, left_leg.forward, Vector3.up);
+        float angle = Mathf.Abs(Vector3.SignedAngle(right_leg.position - left_leg.position, left_leg.forward, Vector3.up));
+
+        Debug.Log("left angle " + angle);
 
         right_knee.parent = null;
         right_foot.parent = null;
 
-        if (Mathf.Abs(angle) >= 89.9 && Mathf.Abs(angle) <= 90.1)
+        if (angle >= 89.8f && angle <= 90.2f)
         //if (Mathf.Abs(angle) == 90.0f)
         {
             right_knee.parent = right_leg;
@@ -713,7 +716,7 @@ public class move_leg : MonoBehaviour
         right_control.parent = right_foot;
         //right_control.parent = right_foot;
 
-        right_leg.Rotate(0, -rotate_speed * Time.deltaTime, 0);
+        right_leg.Rotate(Vector3.up, -rotate_speed * Time.deltaTime);
         //right_leg.Rotate(Vector3.up, rotate_speed * Time.deltaTime);
 
     }
@@ -734,12 +737,14 @@ public class move_leg : MonoBehaviour
         }
 
         //swing leg
-        float angle = Vector3.SignedAngle(left_leg.position - right_leg.position, right_leg.forward, Vector3.up);
+        float angle = Mathf.Abs(Vector3.SignedAngle(left_leg.position - right_leg.position, right_leg.forward, Vector3.up));
 
+        Debug.Log("right angle " + angle);
+        Debug.Log("abs angle " + Mathf.Abs(angle));
         left_knee.parent = null;
         left_foot.parent = null;
 
-        if (Mathf.Abs(angle) >= 89.9 && Mathf.Abs(angle) <= 90.1)
+        if (angle >= 89.8f && angle <= 90.2f)
         //if (Mathf.Abs(angle) == 90.0f)
         {
             left_knee.parent = left_leg;
