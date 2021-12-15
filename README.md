@@ -16,6 +16,7 @@ maybe use inverse kinematics.
 the user only needs to press WASD (possibly QE) to move the humanoid
 
 ~update: \
+Unity Editor Version 2020.3.17f1\
 W move forward\
 S move backwards\
 A turn left\
