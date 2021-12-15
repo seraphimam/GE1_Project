@@ -701,11 +701,11 @@ public class move_leg : MonoBehaviour
         else
         {
             //Debug.Log("swing left leg");
-            left_leg.RotateAround(right_leg.position, Vector3.up, rotate_speed * Time.deltaTime);
-            left_knee.RotateAround(right_knee.position, Vector3.up, rotate_speed * Time.deltaTime);
-            left_foot.RotateAround(right_foot.position, Vector3.up, rotate_speed * Time.deltaTime);
-            left_control.RotateAround(right_control.position, Vector3.up, rotate_speed * Time.deltaTime);
-            left_dir.RotateAround(right_leg.position, Vector3.up, rotate_speed * Time.deltaTime);
+            left_leg.RotateAround(right_leg.position, Vector3.up, -rotate_speed * Time.deltaTime);
+            left_knee.RotateAround(right_knee.position, Vector3.up, -rotate_speed * Time.deltaTime);
+            left_foot.RotateAround(right_foot.position, Vector3.up, -rotate_speed * Time.deltaTime);
+            left_control.RotateAround(right_control.position, Vector3.up, -rotate_speed * Time.deltaTime);
+            left_dir.RotateAround(right_leg.position, Vector3.up, -rotate_speed * Time.deltaTime);
         }
     }//end finish_right_turn()
 
