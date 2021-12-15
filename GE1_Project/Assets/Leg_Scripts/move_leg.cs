@@ -4,18 +4,24 @@ using UnityEngine;
 
 public class move_leg : MonoBehaviour
 {
+    //speed for movement and rotation angle
     public float speed = 2.0f;
     public float rotate_speed = 30.0f;
+
+    //angle of initial rotation of leg before turning
     public float init_rotation = 0.0f;
 
+    //control points for legs and direction pointing
     public Transform right_control;
     public Transform right_dir;
     public Transform left_control;
     public Transform left_dir;
 
+    // original position of directional pointer
     public Vector3 right_dir_org;
     public Vector3 left_dir_org;
 
+    // booleans for making sure behaviour
     public bool is_moving_right_leg;
     public bool is_moving_left_leg;
 
@@ -34,6 +40,7 @@ public class move_leg : MonoBehaviour
     public bool is_turning_right;
     public bool fin_right;
 
+    // cast leg parts to simulate movements
     public Transform right_leg;
     public Transform right_knee;
     public Transform right_foot;
@@ -42,20 +49,26 @@ public class move_leg : MonoBehaviour
     public Transform left_knee;
     public Transform left_foot;
 
+    //cast pelvis
     public Transform pelvis;
 
+    // give point of which pelvis should point towards when moving forward
     public Vector3 pelvis_height_adj;
     public GameObject pelvis_dir;
 
+    // vector from left to right leg
     public Vector3 between_legs;
 
+    // original position of controllers before moving
     public Vector3 right_foot_org;
     public Vector3 left_foot_org;
 
+    // initial distances to ensure behaviour
     public float knee_foot_dist;
     public float leg_dist;
     public float leg_dir_dist;
 
+    // offset for directional pointer
     public Vector3 right_dir_offset;
     public Vector3 left_dir_offset;
 
