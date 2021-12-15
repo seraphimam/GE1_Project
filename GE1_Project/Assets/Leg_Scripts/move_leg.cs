@@ -11,8 +11,8 @@ public class move_leg : MonoBehaviour
     public Transform left_control;
     public Transform left_dir;
 
-    public Vector3 org_pos_r;
-    public Vector3 org_pos_l;
+    public Vector3 right_dir_org;
+    public Vector3 left_dir_org;
 
     public bool is_moving_right_leg;
     public bool is_moving_left_leg;
@@ -79,8 +79,8 @@ public class move_leg : MonoBehaviour
         is_moving_right_leg = false;
         is_moving_left_leg = false;
 
-        org_pos_r = right_dir.position;
-        org_pos_l = left_dir.position;
+        right_dir_org = right_dir.position;
+        left_dir_org = left_dir.position;
 
         right_foot_org = right_control.position;
         left_foot_org = left_control.position;
@@ -99,31 +99,14 @@ public class move_leg : MonoBehaviour
         //move forward
         if (Input.GetKey(KeyCode.W))
         {
-            //if (!is_moving_right_leg) {
-            //    Debug.Log("moving: " + right_leg_in_front);
-            //}
-            //else
-            //{
-            //    //Debug.Log("stop: " + right_leg_in_front);
-            //}
-            
             if ((right_leg_in_front || is_moving_left_leg) && !is_moving_right_leg)
             {
                 right_leg_in_front = false;
                 is_moving_left_leg = true;
 
                 left_leg_forward();
-                
-                pelvis_dir.transform.position = right_dir.position + pelvis_height_adj;
 
-                between_legs = left_leg.position - right_leg.position;
-
-                pelvis.position = left_leg.position - (between_legs / 2.0f);
-
-                pelvis.LookAt(pelvis_dir.transform);
-
-                
-
+                pelvis_follow("left");
             }
             else
             {
@@ -131,16 +114,8 @@ public class move_leg : MonoBehaviour
                 is_moving_right_leg = true;
 
                 right_leg_forward();
-                
-                pelvis_dir.transform.position = left_dir.position + pelvis_height_adj;
 
-                between_legs = right_leg.position - left_leg.position;
-
-                pelvis.position = right_leg.position - (between_legs / 2.0f);
-
-                pelvis.LookAt(pelvis_dir.transform);
-
-                
+                pelvis_follow("right");
 
             }
 
@@ -156,13 +131,15 @@ public class move_leg : MonoBehaviour
 
             if ((right_leg_in_front || is_moving_right_leg) && !is_moving_left_leg)
             {
-                right_leg_backwards();
                 is_moving_right_leg = true;
+                right_leg_backwards();
+                
             }
             else
             {
-                left_leg_backwards();
                 is_moving_left_leg = true;
+                left_leg_backwards();
+                
             }
             //right_control.position += right_control.forward * -speed * Time.deltaTime;
             //right_control.position += right_control.up * -speed * Time.deltaTime;
@@ -220,10 +197,10 @@ public class move_leg : MonoBehaviour
         if ((right_knee.position - right_dir.position).sqrMagnitude <= 0.25)
         {
             right_knee_forward = false;
-            if (Mathf.Abs(right_control.position.x - org_pos_r.x) <= 0.25 && Mathf.Abs(right_control.position.z - org_pos_r.z) <= 0.25)
+            if (Mathf.Abs(right_control.position.x - right_dir_org.x) <= 0.25 && Mathf.Abs(right_control.position.z - right_dir_org.z) <= 0.25)
             {
                 right_foot_forward = false;
-                if (!(Mathf.Abs(right_leg.position.x - org_pos_r.x) <= 0.25 && Mathf.Abs(right_leg.position.z - org_pos_r.z) <= 0.25))
+                if (!(Mathf.Abs(right_leg.position.x - right_dir_org.x) <= 0.25 && Mathf.Abs(right_leg.position.z - right_dir_org.z) <= 0.25))
                 {
                     right_foot_down = true;
                     //Debug.Log("foot down");
@@ -245,7 +222,7 @@ public class move_leg : MonoBehaviour
             if (right_control.position.y <= 0.5)
             {
                 right_foot_down = false;
-                org_pos_r = right_dir.position;
+                right_dir_org = right_dir.position;
                 right_leg_in_front = true;
                 is_moving_right_leg = false;
                 //Debug.Log("End Foot Down");
@@ -296,10 +273,10 @@ public class move_leg : MonoBehaviour
         if ((left_knee.position - left_dir.position).sqrMagnitude <= 0.25)
         {
             left_knee_forward = false;
-            if (Mathf.Abs(left_control.position.x - org_pos_l.x) <= 0.25 && Mathf.Abs(left_control.position.z - org_pos_l.z) <= 0.25)
+            if (Mathf.Abs(left_control.position.x - left_dir_org.x) <= 0.25 && Mathf.Abs(left_control.position.z - left_dir_org.z) <= 0.25)
             {
                 left_foot_forward = false;
-                if (!(Mathf.Abs(left_leg.position.x - org_pos_l.x) <= 0.25 && Mathf.Abs(left_leg.position.z - org_pos_l.z) <= 0.25))
+                if (!(Mathf.Abs(left_leg.position.x - left_dir_org.x) <= 0.25 && Mathf.Abs(left_leg.position.z - left_dir_org.z) <= 0.25))
                 {
                     left_foot_down = true;
                     //Debug.Log("foot down");
@@ -321,7 +298,7 @@ public class move_leg : MonoBehaviour
             if (left_control.position.y <= 0.5)
             {
                 left_foot_down = false;
-                org_pos_l = left_dir.position;
+                left_dir_org = left_dir.position;
                 right_leg_in_front = false;
                 is_moving_left_leg = false;
                 //Debug.Log("End Foot Down");
@@ -332,6 +309,7 @@ public class move_leg : MonoBehaviour
         move_forward_left();
     }// end right_leg_forward()
 
+    //move right leg backwards
     void right_leg_backwards()
     {
         float dist = (right_foot.position - right_foot_org).magnitude;
@@ -341,15 +319,34 @@ public class move_leg : MonoBehaviour
         {
             right_control.position += right_control.up * -speed * Time.deltaTime;
             right_control.position += right_control.forward * -speed * Time.deltaTime;
+            right_leg.position += right_leg.forward * -speed * Time.deltaTime;
+            right_dir.position += right_dir.forward * -speed * Time.deltaTime;
+
+            pelvis_dir.transform.position = right_dir.position + pelvis_height_adj;
+
+            between_legs = right_leg.position - left_leg.position;
+
+            pelvis.position = right_leg.position - (between_legs / 2.0f);
+
+            pelvis.LookAt(pelvis_dir.transform);
         }//move foot upwards
         else
         {
             right_control.position += right_control.up * speed * Time.deltaTime;
-            left_control.position += left_control.forward * -speed * 0.5f * Time.deltaTime;
+            right_control.position += right_control.forward * -speed * 0.5f * Time.deltaTime;
             //right_foot.position = right_control.position;
+        }
+
+        if (right_control.position.y <= 0.5)
+        {
+            is_moving_right_leg = false;
+            right_leg_in_front = false;
+            right_control.position = right_foot.position;
+            right_foot_org = right_control.position;
         }
     }// end right_leg_backwards()
 
+    //move left leg backwards
     void left_leg_backwards()
     {
         float dist = (left_foot.position - left_foot_org).magnitude;
@@ -359,6 +356,16 @@ public class move_leg : MonoBehaviour
         {
             left_control.position += left_control.up * -speed * Time.deltaTime;
             left_control.position += left_control.forward * -speed * Time.deltaTime;
+            left_leg.position += left_leg.forward * -speed * Time.deltaTime;
+            left_dir.position += left_dir.forward * -speed * Time.deltaTime;
+
+            pelvis_dir.transform.position = left_dir.position + pelvis_height_adj;
+
+            between_legs = left_leg.position - right_leg.position;
+
+            pelvis.position = left_leg.position - (between_legs / 2.0f);
+
+            pelvis.LookAt(pelvis_dir.transform);
         }//move foot upwards
         else
         {
@@ -366,5 +373,40 @@ public class move_leg : MonoBehaviour
             left_control.position += left_control.forward * -speed * 0.5f * Time.deltaTime;
             //left_foot.position = left_control.position;
         }
+
+        if(left_control.position.y <= 0.5)
+        {
+            is_moving_left_leg = false;
+            right_leg_in_front = true;
+            left_control.position = left_foot.position;
+            left_foot_org = left_control.position;
+        }
     }// end left_leg_backwards
+
+    //make pelvis follow leg movement, mode "left" and "right"
+    void pelvis_follow(string mode)
+    {
+        if(mode.Equals("right"))
+        {
+            pelvis_dir.transform.position = left_dir.position + pelvis_height_adj;
+
+            between_legs = right_leg.position - left_leg.position;
+
+            pelvis.position = right_leg.position - (between_legs / 2.0f);
+
+            pelvis.LookAt(pelvis_dir.transform);
+        }
+
+        if (mode.Equals("left"))
+        {
+            pelvis_dir.transform.position = right_dir.position + pelvis_height_adj;
+
+            between_legs = left_leg.position - right_leg.position;
+
+            pelvis.position = left_leg.position - (between_legs / 2.0f);
+
+            pelvis.LookAt(pelvis_dir.transform);
+        }
+
+    }//end pelvis_follow()
 }
