@@ -127,7 +127,9 @@ public class move_leg : MonoBehaviour
         {
             if (is_turning_left)
             {
-                if (Input.GetKeyUp(KeyCode.A) || Mathf.Abs(Mathf.Abs(left_leg.rotation.y) - Mathf.Abs(init_rotation)) >= 30.0f || fin_left)
+                //Debug.Log("angle: " + left_leg.localRotation.eulerAngles.y);
+                //Debug.Log("init: " + init_rotation);
+                if (Input.GetKeyUp(KeyCode.A) || Mathf.Abs(Mathf.Abs(left_leg.localRotation.eulerAngles.y) - Mathf.Abs(init_rotation)) >= 30.0f || fin_left)
                 {
                     fin_left = true;
                     finish_left_turn();
@@ -202,6 +204,11 @@ public class move_leg : MonoBehaviour
         {
             if (!is_moving_right_leg && !is_moving_left_leg)
             {
+                if (!is_turning_left)
+                {
+                    init_rotation = left_leg.localRotation.eulerAngles.y;
+                }
+
                 turn_left();
             }
             else
@@ -491,14 +498,14 @@ public class move_leg : MonoBehaviour
         left_control.parent = left_foot;
         right_control.parent = right_foot;
 
-        left_leg.Rotate(0, rotate_speed * Time.deltaTime, 0);
-        right_leg.Rotate(0, rotate_speed * Time.deltaTime, 0);
+        left_leg.Rotate(Vector3.up, rotate_speed * Time.deltaTime);
+        right_leg.Rotate(Vector3.up, rotate_speed * Time.deltaTime);
         
     }
 
     void finish_left_turn()
     {
-        Debug.Log("finishing left turn");
+        //Debug.Log("finishing left turn");
 
         if (is_turning_left)
         {
@@ -518,6 +525,13 @@ public class move_leg : MonoBehaviour
             //right_foot_down = true;
             //right_control.position += right_control.forward * -speed * Time.deltaTime;
             right_control.position += right_control.up * -speed * Time.deltaTime;
+
+            if(right_control.position.y <= 0.5)
+            {
+                right_foot_org = right_control.position;
+                fin_left = false;
+                is_turning_left = false;
+            }
         }
         else
         {

@@ -27,17 +27,17 @@ public class camera_follow : MonoBehaviour
         if (Input.GetKey(KeyCode.J))
         {
             //offset = (5.0f, 0.0f, 5.0f);
-            offset.x = 5.0f;
-            offset.y = 0.0f;
-            offset.z = 5.0f;
+            offset.x = 10.0f;
+            offset.y = -2.0f;
+            offset.z = 10.0f;
         }
 
         if (Input.GetKey(KeyCode.L))
         {
             //offset = (-5.0f, 0.0f, -5.0f);
-            offset.x = -5.0f;
-            offset.y = 0.0f;
-            offset.z = -5.0f;
+            offset.x = -10.0f;
+            offset.y = -2.0f;
+            offset.z = -10.0f;
         }
 
         //https://answers.unity.com/questions/1482210/how-to-make-an-object-always-in-front-of-the-ovrpl.html
