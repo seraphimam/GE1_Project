@@ -5,6 +5,8 @@ using UnityEngine;
 public class move_leg : MonoBehaviour
 {
     public float speed = 2.0f;
+    public float rotate_speed = 30.0f;
+    public float init_rotation = 0.0f;
 
     public Transform right_control;
     public Transform right_dir;
@@ -26,6 +28,9 @@ public class move_leg : MonoBehaviour
     public bool left_knee_forward;
     public bool left_foot_forward;
     public bool left_foot_down;
+
+    public bool is_turning_left;
+    public bool is_turning_right;
 
     public Transform right_leg;
     public Transform right_knee;
@@ -49,7 +54,11 @@ public class move_leg : MonoBehaviour
     public float leg_dist;
     public float leg_dir_dist;
 
-    public 
+    public Vector3 right_dir_offset;
+    public Vector3 left_dir_offset;
+
+    public Vector3 right_offset;
+    public Vector3 left_offset;
 
     // Start is called before the first frame update
     void Start()
@@ -83,6 +92,9 @@ public class move_leg : MonoBehaviour
         is_moving_right_leg = false;
         is_moving_left_leg = false;
 
+        is_turning_right = false;
+        is_turning_left = false;
+
         right_dir_org = right_dir.position;
         left_dir_org = left_dir.position;
 
@@ -92,12 +104,41 @@ public class move_leg : MonoBehaviour
         knee_foot_dist = (right_knee.position - right_foot.position).magnitude;
         leg_dir_dist = (right_leg.position - right_dir.position).magnitude;
         leg_dist = (right_leg.position - left_leg.position).magnitude;
+
+        right_dir_offset = right_leg.position - right_dir.position;
+        left_dir_offset = left_leg.position - left_dir.position;
+
+        left_offset = new Vector3(0, 0, 0);
+        right_offset = new Vector3(0, 0, 0);
     }
 
     // Update is called once per frame
     void Update()
     {
-        move();
+        if(!is_turning_left && !is_turning_right)
+        {
+            move();
+        }
+        else
+        {
+            if (is_turning_left)
+            {
+                if (Input.GetKeyUp(KeyCode.A) || Mathf.Abs(Mathf.Abs(left_leg.rotation.y) - Mathf.Abs(init_rotation)) >= 30.0f)
+                {
+                    finish_left_turn();
+                }
+                else
+                {
+                    turn_left();
+                }
+                
+            }
+
+            if (is_turning_right)
+            {
+
+            }
+        }
 
         //dist_correction();
     }
@@ -156,9 +197,7 @@ public class move_leg : MonoBehaviour
         {
             if (!is_moving_right_leg && !is_moving_left_leg)
             {
-                
                 turn_left();
-
             }
             else
             {
@@ -439,7 +478,28 @@ public class move_leg : MonoBehaviour
     //turn left
     void turn_left()
     {
-        left_leg.Rotate(0, speed * Time.deltaTime, 0);
+        is_turning_left = true;
+
+        left_dir.parent = left_leg;
+        right_dir.parent = right_leg;
+
+        left_control.parent = left_foot;
+        right_control.parent = right_foot;
+
+        left_leg.Rotate(0, rotate_speed * Time.deltaTime, 0);
+        right_leg.Rotate(0, rotate_speed * Time.deltaTime, 0);
+        
+    }
+
+    void finish_left_turn()
+    {
+        is_turning_left = false;
+
+        left_dir.parent = null;
+        right_dir.parent = null;
+
+        left_control.parent = null;
+        right_control.parent = null;
     }
 
     //void dist_correction()

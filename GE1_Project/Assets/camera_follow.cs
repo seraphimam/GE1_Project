@@ -9,7 +9,7 @@ public class camera_follow : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        offset = new Vector3(10.0f, 0.0f, 10.0f);
+        offset = new Vector3(0.0f, 10.0f, 5.0f);
         target = GameObject.Find("Pelvis").transform;
     }
 
