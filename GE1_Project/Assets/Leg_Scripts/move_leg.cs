@@ -81,6 +81,7 @@ public class move_leg : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        // find corresponding objects
         right_control = GameObject.Find("R_Foot_ctrl").transform;
         right_dir = GameObject.Find("R_Foot_dir").transform;
         right_leg = GameObject.Find("Leg_R").transform;
@@ -94,9 +95,12 @@ public class move_leg : MonoBehaviour
         left_foot = GameObject.Find("Foot_L").transform;
 
         pelvis = GameObject.Find("Pelvis").transform;
+
+        //create invisible gameobject for the pelvis to tilt towards when legs move
         pelvis_dir = new GameObject();
         pelvis_height_adj = new Vector3(0f, 1.0f, 0f);
 
+        //boolean controls
         right_leg_in_front = false;
 
         right_knee_forward = false;
@@ -118,83 +122,99 @@ public class move_leg : MonoBehaviour
         is_moving_forward = false;
         is_moving_backwards = false;
 
+        //initial position of directional controls
         right_dir_org = right_dir.position;
         left_dir_org = left_dir.position;
 
+        //initial position of movement controls
         right_foot_org = right_control.position;
         left_foot_org = left_control.position;
 
+        //initial distance for readjustments
         knee_foot_dist = (right_knee.position - right_foot.position).magnitude;
         leg_dir_dist = (right_leg.position - right_dir.position).magnitude;
         leg_dist = (right_leg.position - left_leg.position).magnitude;
 
+        //offsets for turning
         right_dir_offset = right_leg.position - right_dir.position;
         left_dir_offset = left_leg.position - left_dir.position;
 
         left_offset = new Vector3(0, 0, 0);
         right_offset = new Vector3(0, 0, 0);
-
-        //Debug.Log("start dist: " + (right_leg.position - left_leg.position).magnitude);
+        
     }
 
     // Update is called once per frame
     void Update()
     {
-        //Debug.Log("dist: " + (right_leg.position - left_leg.position).magnitude);
-        //Debug.Log("mf: " + is_moving_forward);
+        //if model is stationary, move according to user input
         if (!is_turning_left && !is_turning_right && !is_moving_backwards && !is_moving_forward)
         {
             move();
         }
         else
         {
+            //otherwise follow last instruction until finished
+
+            //continue to turn left until finish
             if (is_turning_left)
             {
-                //Debug.Log("angle: " + left_leg.localRotation.eulerAngles.y);
-                //Debug.Log("init: " + init_rotation);
+                //find rotational angle of left leg
                 float left_angle = left_leg.localRotation.eulerAngles.y;
+
+                //range 0-360, turn left is added onto, 
+                //so needs to lock range of 30 degrees max turn rate per command
                 if(init_rotation >= 330)
                 {
                     left_angle += 360;
                 }
 
+                //if user released A or turn angle >= 30 degrees (force end turn) or still completing turn motion
                 if (Input.GetKeyUp(KeyCode.A) || Mathf.Abs(left_angle - init_rotation) >= 30.0f || fin_left)
                 {
+                    //keep completing the turn
                     fin_left = true;
                     finish_left_turn();
                 }
                 else
                 {
+                    //just start turning left (angle adjustment)
                     turn_left();
                 }
                 
             }
 
+            //continue to turn right until finish
             if (is_turning_right)
             {
-                //Debug.Log("angle: " + right_leg.localRotation.eulerAngles.y);
-                //Debug.Log("init: " + init_rotation);
+                //find rotational angle of right leg
                 float right_angle = right_leg.localRotation.eulerAngles.y;
+
+                //range 0-360, turn left is subtracted from,
+                //so needs to lock range of 30 degrees max turn rate per command
                 if (init_rotation <= 30)
                 {
                     right_angle -= 360;
                 }
 
+                //if user released D or turn angle >= 30 degrees (force end turn) or still completing turn motion
                 if (Input.GetKeyUp(KeyCode.D) || Mathf.Abs(init_rotation - right_angle) >= 30.0f || fin_right)
                 {
-                    //Debug.Log("fin");
+                    //keep completing the turn
                     fin_right = true;
                     finish_right_turn();
                 }
                 else
                 {
+                    //just start turning right (angle adjustment)
                     turn_right();
                 }
             }
 
+            //if still moving forward
             if (is_moving_forward)
             {
-                //Debug.Log("force forward");
+                //move the leg in front forward
                 if (right_leg_in_front)
                 {
                     right_leg_forward();
@@ -205,9 +225,10 @@ public class move_leg : MonoBehaviour
                 }
             }
 
+            //if still moving backwards
             if (is_moving_backwards)
             {
-                //Debug.Log("force back");
+                //move the leg in front backwards (leg order unchanged until finish moving)
                 if (right_leg_in_front)
                 {
                     right_leg_backwards();
@@ -219,78 +240,99 @@ public class move_leg : MonoBehaviour
             }
         }
 
+        //used to use for turn distance correction
         //dist_correction();
     }
 
+    //move according to user input
     void move()
     {
         //move forward
         if (Input.GetKey(KeyCode.W))
         {
+            //move leg behind or the one that is already moving
             if ((right_leg_in_front || is_moving_left_leg) && !is_moving_right_leg)
             {
+                //left leg in front
                 right_leg_in_front = false;
+
+                //left leg is moving
                 is_moving_left_leg = true;
+
+                //moving forward
                 is_moving_forward = true;
 
+                //move left leg forward
                 left_leg_forward();
 
+                //make pelvis tilt to correct side following movement
                 pelvis_follow("left");
             }
             else
             {
+                //right leg in front
                 right_leg_in_front = true;
+                
+                //right leg is moving
                 is_moving_right_leg = true;
+
+                //moving forward
                 is_moving_forward = true;
 
+                //move right leg forward
                 right_leg_forward();
 
+                //make pelvis tilt to correct side following movement
                 pelvis_follow("right");
 
             }
-
-            //Debug.Log("forward left moving: " + is_moving_left_leg);
-            //Debug.Log("forward right moving: " + is_moving_right_leg);
+            
         }//end moveforward if
 
         // move backwards
         if (Input.GetKey(KeyCode.S))
         {
-            //Debug.Log("left moving: " + is_moving_left_leg);
-            //Debug.Log("right moving: " + is_moving_right_leg);
-            //Debug.Log("right left front: " + right_leg_in_front);
-
+            //move leg in front or leg already moving backwards
             if ((right_leg_in_front || is_moving_right_leg) && !is_moving_left_leg)
             {
+                //move right leg backwards
                 //Debug.Log("moving right");
                 is_moving_right_leg = true;
                 is_moving_backwards = true;
+
                 right_leg_backwards();
                 
             }
             else
             {
+                //move left leg backwards
                 //Debug.Log("moving left");
                 is_moving_left_leg = true;
                 is_moving_backwards = true;
+
                 left_leg_backwards();
                 
             }
         }//end move backwards if
 
+        //turn left
         if (Input.GetKey(KeyCode.A))
         {
+            //when legs are both on ground
             if (!is_moving_right_leg && !is_moving_left_leg)
             {
+                //if starting to turn left, record initial rotation (for 30 degrees lock)
                 if (!is_turning_left)
                 {
                     init_rotation = left_leg.localRotation.eulerAngles.y;
                 }
 
+                //start turn left
                 turn_left();
             }
             else
             {
+                //set the moving foot back down onto ground
                 if (is_moving_right_leg)
                 {
                     right_control.position += right_control.up * -speed * Time.deltaTime;
@@ -313,22 +355,25 @@ public class move_leg : MonoBehaviour
             }
         }//end turn left (A)
 
+
+        //turn right
         if (Input.GetKey(KeyCode.D))
         {
-            //Debug.Log("DDDD");
+            //when both legs on ground
             if (!is_moving_right_leg && !is_moving_left_leg)
             {
-                //Debug.Log("not moving");
+                //record starting rotation
                 if (!is_turning_right)
                 {
                     init_rotation = right_leg.localRotation.eulerAngles.y;
                 }
 
+                //start turn right
                 turn_right();
             }
             else
             {
-                //Debug.Log("else");
+                //set moving foot back down to ground
                 if (is_moving_right_leg)
                 {
                     right_control.position += right_control.up * -speed * Time.deltaTime;
@@ -352,14 +397,17 @@ public class move_leg : MonoBehaviour
         }//end turn right(D)
     }// end move()
 
+    //move right leg forward
     void move_forward_right()
     {
+        //if foot is to start setting down, don't move knee nor foot forward
         if (right_foot_down)
         {
             right_knee_forward = false;
             right_foot_forward = false;
         }
 
+        //move knee forward
         if (right_knee_forward)
         {
             //Debug.Log("knee forward + foot");
@@ -368,6 +416,7 @@ public class move_leg : MonoBehaviour
             right_foot.position = right_control.position;
         }
 
+        //move foot forward
         if (right_foot_forward)
         {
             //Debug.Log("Foot Forward only");
@@ -375,6 +424,7 @@ public class move_leg : MonoBehaviour
             right_foot.position = right_control.position;
         }
 
+        //set foot down
         if (right_foot_down)
         {
             //Debug.Log("foot down");
@@ -388,14 +438,20 @@ public class move_leg : MonoBehaviour
 
     }// end move_forward()
 
+    //boolean determinate for right leg move forward
     void right_leg_forward()
     {
+        //if knee at directional controller, stop moving knee forward
         if ((right_knee.position - right_dir.position).sqrMagnitude <= 0.25)
         {
             right_knee_forward = false;
+
+            //if foot under directional controller (original), stop moving foot forward
             if (Mathf.Abs(right_control.position.x - right_dir_org.x) <= 0.25 && Mathf.Abs(right_control.position.z - right_dir_org.z) <= 0.25)
             {
                 right_foot_forward = false;
+
+                //set foot down when leg is on top of directional controller (original)
                 if (!(Mathf.Abs(right_leg.position.x - right_dir_org.x) <= 0.25 && Mathf.Abs(right_leg.position.z - right_dir_org.z) <= 0.25))
                 {
                     right_foot_down = true;
@@ -413,8 +469,11 @@ public class move_leg : MonoBehaviour
             right_knee_forward = true;
         }
 
+        //if setting foot down
         if (right_foot_down)
         {
+            // when foot on ground stop forward movement and reset original positions 
+            //and change right foot to be in front
             if (right_control.position.y <= 0.5)
             {
                 right_foot_down = false;
@@ -433,13 +492,14 @@ public class move_leg : MonoBehaviour
     //move_left
     void move_forward_left()
     {
-
+        //if foot is to start setting down, don't move knee nor foot forward
         if (left_foot_down)
         {
             left_knee_forward = false;
             left_foot_forward = false;
         }
 
+        //move knee forward
         if (left_knee_forward)
         {
             //Debug.Log("knee forward + foot");
@@ -447,12 +507,14 @@ public class move_leg : MonoBehaviour
             left_control.position += left_control.up * speed * Time.deltaTime;
         }
 
+        //move foot forward
         if (left_foot_forward)
         {
             //Debug.Log("Foot Forward only");
             left_control.position += left_control.forward * speed * Time.deltaTime;
         }
 
+        //set foot down
         if (left_foot_down)
         {
             //Debug.Log("foot down");
@@ -465,6 +527,7 @@ public class move_leg : MonoBehaviour
 
     }// end move_forward()
 
+    //left leg boolean determinate same as right leg
     void left_leg_forward()
     {
         if ((left_knee.position - left_dir.position).sqrMagnitude <= 0.25)
@@ -552,6 +615,8 @@ public class move_leg : MonoBehaviour
         float dist = (left_foot.position - left_foot_org).magnitude;
         //Debug.Log("dist: " + dist);
         //Debug.Log("knee dist: " + knee_foot_dist);
+
+        //when foot reaches right height to step back
         if (dist > knee_foot_dist / 3.0f)
         {
             left_control.position += left_control.up * -speed * Time.deltaTime;
@@ -575,6 +640,7 @@ public class move_leg : MonoBehaviour
             //left_foot.position = left_control.position;
         }
 
+        //set boolean controls and org positions
         if(left_control.position.y <= 0.5)
         {
             is_moving_left_leg = false;
@@ -628,6 +694,7 @@ public class move_leg : MonoBehaviour
         
     }
 
+    //complete left turn
     void finish_left_turn()
     {
         //Debug.Log("finishing left turn");
@@ -669,6 +736,7 @@ public class move_leg : MonoBehaviour
         }
         else
         {
+            //swing right leg around left
             right_leg.RotateAround(left_leg.position, Vector3.up, rotate_speed * Time.deltaTime);
             right_knee.RotateAround(left_knee.position, Vector3.up, rotate_speed * Time.deltaTime);
             right_foot.RotateAround(left_foot.position, Vector3.up, rotate_speed * Time.deltaTime);
@@ -721,6 +789,7 @@ public class move_leg : MonoBehaviour
 
     }
 
+    //complete right turn, like left
     void finish_right_turn()
     {
         //Debug.Log("finishing right turn");
