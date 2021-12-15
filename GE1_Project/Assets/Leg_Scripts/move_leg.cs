@@ -502,7 +502,7 @@ public class move_leg : MonoBehaviour
 
         if (is_turning_left)
         {
-            is_turning_left = false;
+            //is_turning_left = false;
 
             left_dir.parent = null;
             right_dir.parent = null;
