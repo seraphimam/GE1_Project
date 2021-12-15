@@ -114,6 +114,8 @@ public class move_leg : MonoBehaviour
 
         left_offset = new Vector3(0, 0, 0);
         right_offset = new Vector3(0, 0, 0);
+
+        //Debug.Log("start dist: " + (right_leg.position - right_dir.position).magnitude);
     }
 
     // Update is called once per frame
@@ -215,11 +217,29 @@ public class move_leg : MonoBehaviour
             {
                 if (is_moving_right_leg)
                 {
-                    right_leg_backwards();
+                    //if (Mathf.Abs(right_control.position.x - right_dir_org.x) <= 0.25 && Mathf.Abs(right_control.position.z - right_dir_org.z) <= 0.25)
+                    //{
+                    //    right_control.position += right_control.up * -speed * Time.deltaTime;
+                    //}
+                    //else
+                    //{
+                    //    right_leg.position += right_leg.forward * speed * Time.deltaTime;
+                    //}
+
+                    right_control.position += right_control.up * -speed * Time.deltaTime;
+
+                    if (right_control.position.y <= 0.5)
+                    {
+                        is_moving_right_leg = false;
+                    }
                 }
                 else if (is_moving_left_leg)
                 {
-                    left_leg_backwards();
+                    left_control.position += left_control.up * -speed * Time.deltaTime;
+                    if (left_control.position.y <= 0.5)
+                    {
+                        is_moving_left_leg = false;
+                    }
                 }
                 
             }
@@ -493,13 +513,13 @@ public class move_leg : MonoBehaviour
         is_turning_left = true;
 
         left_dir.parent = left_leg;
-        right_dir.parent = right_leg;
+        //right_dir.parent = right_leg;
 
         left_control.parent = left_foot;
-        right_control.parent = right_foot;
+        //right_control.parent = right_foot;
 
         left_leg.Rotate(Vector3.up, rotate_speed * Time.deltaTime);
-        right_leg.Rotate(Vector3.up, rotate_speed * Time.deltaTime);
+        //right_leg.Rotate(Vector3.up, rotate_speed * Time.deltaTime);
         
     }
 
@@ -512,40 +532,68 @@ public class move_leg : MonoBehaviour
             //is_turning_left = false;
 
             left_dir.parent = null;
-            right_dir.parent = null;
+            //right_dir.parent = null;
 
             left_control.parent = null;
-            right_control.parent = null;
+            //right_control.parent = null;
         }
 
+        //swing leg
         float angle = Vector3.SignedAngle(right_leg.position - left_leg.position, left_leg.forward, Vector3.up);
 
-        if(Mathf.Abs(angle) >= 89.8 && Mathf.Abs(angle) <= 90.2)
-        {
-            //right_foot_down = true;
-            //right_control.position += right_control.forward * -speed * Time.deltaTime;
-            right_control.position += right_control.up * -speed * Time.deltaTime;
+        right_knee.parent = null;
+        right_foot.parent = null;
 
-            if(right_control.position.y <= 0.5)
-            {
-                right_foot_org = right_control.position;
-                fin_left = false;
-                is_turning_left = false;
-            }
+        if (Mathf.Abs(angle) >= 89.9 && Mathf.Abs(angle) <= 90.1)
+        //if (Mathf.Abs(angle) == 90.0f)
+        {
+            right_knee.parent = right_leg;
+            right_foot.parent = right_knee;
+            //Debug.Log("dist: " + (right_leg.position - right_dir.position).magnitude);
+            right_foot_org = right_control.position;
+            right_dir_org = right_dir.position;
+            fin_left = false;
+            is_turning_left = false;
+
+            left_foot_org = left_control.position;
+            left_dir_org = left_dir.position;
+            right_leg_in_front = true;
+
         }
         else
         {
-            if((right_knee.position - right_dir.position).sqrMagnitude <= 0.25)
-            {
-                right_leg.position += right_leg.forward * speed * Time.deltaTime;
-                right_dir.position += right_dir.forward * speed * Time.deltaTime;
-            }
-            else
-            {
-                right_control.position += right_control.forward * speed * Time.deltaTime;
-                right_control.position += right_control.up * speed * Time.deltaTime;
-            }
+            right_leg.RotateAround(left_leg.position, Vector3.up, rotate_speed * Time.deltaTime);
+            right_knee.RotateAround(left_knee.position, Vector3.up, rotate_speed * Time.deltaTime);
+            right_foot.RotateAround(left_foot.position, Vector3.up, rotate_speed * Time.deltaTime);
+            right_control.RotateAround(left_control.position, Vector3.up, rotate_speed * Time.deltaTime);
+            right_dir.RotateAround(left_leg.position, Vector3.up, rotate_speed * Time.deltaTime);
         }
+        //if(Mathf.Abs(angle) >= 89.9 && Mathf.Abs(angle) <= 90.1)
+        //{
+        //    //right_foot_down = true;
+        //    //right_control.position += right_control.forward * -speed * Time.deltaTime;
+        //    right_control.position += right_control.up * -speed * Time.deltaTime;
+
+        //    if(right_control.position.y <= 0.5)
+        //    {
+        //        right_foot_org = right_control.position;
+        //        fin_left = false;
+        //        is_turning_left = false;
+        //    }
+        //}
+        //else
+        //{
+        //    if((right_knee.position - right_dir.position).sqrMagnitude <= 0.25)
+        //    {
+        //        right_leg.position += right_leg.forward * speed * Time.deltaTime;
+        //        right_dir.position += right_dir.forward * speed * Time.deltaTime;
+        //    }
+        //    else
+        //    {
+        //        right_control.position += right_control.forward * speed * Time.deltaTime;
+        //        right_control.position += right_control.up * speed * Time.deltaTime;
+        //    }
+        //}
     }
 
     //void dist_correction()
