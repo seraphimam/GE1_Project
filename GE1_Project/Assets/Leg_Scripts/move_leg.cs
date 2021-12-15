@@ -128,6 +128,7 @@ public class move_leg : MonoBehaviour
         {
             //Debug.Log("left moving: " + is_moving_left_leg);
             //Debug.Log("right moving: " + is_moving_right_leg);
+            Debug.Log("right left front: " + right_leg_in_front);
 
             if ((right_leg_in_front || is_moving_right_leg) && !is_moving_left_leg)
             {
@@ -321,6 +322,7 @@ public class move_leg : MonoBehaviour
             right_control.position += right_control.forward * -speed * Time.deltaTime;
             right_leg.position += right_leg.forward * -speed * Time.deltaTime;
             right_dir.position += right_dir.forward * -speed * Time.deltaTime;
+            right_dir_org = right_dir.position;
 
             pelvis_dir.transform.position = right_dir.position + pelvis_height_adj;
 
@@ -358,6 +360,7 @@ public class move_leg : MonoBehaviour
             left_control.position += left_control.forward * -speed * Time.deltaTime;
             left_leg.position += left_leg.forward * -speed * Time.deltaTime;
             left_dir.position += left_dir.forward * -speed * Time.deltaTime;
+            left_dir_org = left_dir.position;
 
             pelvis_dir.transform.position = left_dir.position + pelvis_height_adj;
 
