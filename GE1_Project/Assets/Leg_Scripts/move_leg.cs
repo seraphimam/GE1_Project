@@ -615,6 +615,7 @@ public class move_leg : MonoBehaviour
             right_foot.RotateAround(left_foot.position, Vector3.up, rotate_speed * Time.deltaTime);
             right_control.RotateAround(left_control.position, Vector3.up, rotate_speed * Time.deltaTime);
             right_dir.RotateAround(left_leg.position, Vector3.up, rotate_speed * Time.deltaTime);
+            pelvis.RotateAround(left_leg.position, Vector3.up, rotate_speed * Time.deltaTime);
         }
         //if(Mathf.Abs(angle) >= 89.9 && Mathf.Abs(angle) <= 90.1)
         //{
@@ -706,6 +707,7 @@ public class move_leg : MonoBehaviour
             left_foot.RotateAround(right_foot.position, Vector3.up, -rotate_speed * Time.deltaTime);
             left_control.RotateAround(right_control.position, Vector3.up, -rotate_speed * Time.deltaTime);
             left_dir.RotateAround(right_leg.position, Vector3.up, -rotate_speed * Time.deltaTime);
+            pelvis.RotateAround(right_leg.position, Vector3.up, -rotate_speed * Time.deltaTime);
         }
     }//end finish_right_turn()
 
