@@ -40,6 +40,9 @@ public class move_leg : MonoBehaviour
     public bool is_turning_right;
     public bool fin_right;
 
+    public bool is_moving_forward;
+    public bool is_moving_backwards;
+
     // cast leg parts to simulate movements
     public Transform right_leg;
     public Transform right_knee;
@@ -112,6 +115,9 @@ public class move_leg : MonoBehaviour
         is_turning_left = false;
         fin_left = false;
 
+        is_moving_forward = false;
+        is_moving_backwards = false;
+
         right_dir_org = right_dir.position;
         left_dir_org = left_dir.position;
 
@@ -134,7 +140,8 @@ public class move_leg : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(!is_turning_left && !is_turning_right)
+        //Debug.Log("mf: " + is_moving_forward);
+        if(!is_turning_left && !is_turning_right && !is_moving_backwards && !is_moving_forward)
         {
             move();
         }
@@ -183,6 +190,32 @@ public class move_leg : MonoBehaviour
                     turn_right();
                 }
             }
+
+            if (is_moving_forward)
+            {
+                //Debug.Log("force forward");
+                if (right_leg_in_front)
+                {
+                    right_leg_forward();
+                }
+                else
+                {
+                    left_leg_forward();
+                }
+            }
+
+            if (is_moving_backwards)
+            {
+                //Debug.Log("force back");
+                if (right_leg_in_front)
+                {
+                    right_leg_backwards();
+                }
+                else
+                {
+                    left_leg_backwards();
+                }
+            }
         }
 
         //dist_correction();
@@ -197,6 +230,7 @@ public class move_leg : MonoBehaviour
             {
                 right_leg_in_front = false;
                 is_moving_left_leg = true;
+                is_moving_forward = true;
 
                 left_leg_forward();
 
@@ -206,6 +240,7 @@ public class move_leg : MonoBehaviour
             {
                 right_leg_in_front = true;
                 is_moving_right_leg = true;
+                is_moving_forward = true;
 
                 right_leg_forward();
 
@@ -226,13 +261,17 @@ public class move_leg : MonoBehaviour
 
             if ((right_leg_in_front || is_moving_right_leg) && !is_moving_left_leg)
             {
+                //Debug.Log("moving right");
                 is_moving_right_leg = true;
+                is_moving_backwards = true;
                 right_leg_backwards();
                 
             }
             else
             {
+                //Debug.Log("moving left");
                 is_moving_left_leg = true;
+                is_moving_backwards = true;
                 left_leg_backwards();
                 
             }
@@ -381,6 +420,7 @@ public class move_leg : MonoBehaviour
                 right_dir_org = right_dir.position;
                 right_leg_in_front = true;
                 is_moving_right_leg = false;
+                is_moving_forward = false;
                 //Debug.Log("End Foot Down");
             }
         }
@@ -457,6 +497,7 @@ public class move_leg : MonoBehaviour
                 left_dir_org = left_dir.position;
                 right_leg_in_front = false;
                 is_moving_left_leg = false;
+                is_moving_forward = false;
                 //Debug.Log("End Foot Down");
             }
         }
@@ -474,7 +515,7 @@ public class move_leg : MonoBehaviour
         if(dist > knee_foot_dist / 3.0f)
         {
             right_control.position += right_control.up * -speed * Time.deltaTime;
-            right_control.position += right_control.forward * -speed * Time.deltaTime;
+            //right_control.position += right_control.forward * -speed * Time.deltaTime;
             right_leg.position += right_leg.forward * -speed * Time.deltaTime;
             right_dir.position += right_dir.forward * -speed * Time.deltaTime;
             right_dir_org = right_dir.position;
@@ -490,7 +531,7 @@ public class move_leg : MonoBehaviour
         else
         {
             right_control.position += right_control.up * speed * Time.deltaTime;
-            right_control.position += right_control.forward * -speed * 0.5f * Time.deltaTime;
+            right_control.position += right_control.forward * -speed * Time.deltaTime;
             //right_foot.position = right_control.position;
         }
 
@@ -500,6 +541,7 @@ public class move_leg : MonoBehaviour
             right_leg_in_front = false;
             right_control.position = right_foot.position;
             right_foot_org = right_control.position;
+            is_moving_backwards = false;
         }
     }// end right_leg_backwards()
 
@@ -512,7 +554,7 @@ public class move_leg : MonoBehaviour
         if (dist > knee_foot_dist / 3.0f)
         {
             left_control.position += left_control.up * -speed * Time.deltaTime;
-            left_control.position += left_control.forward * -speed * Time.deltaTime;
+            //left_control.position += left_control.forward * -speed * Time.deltaTime;
             left_leg.position += left_leg.forward * -speed * Time.deltaTime;
             left_dir.position += left_dir.forward * -speed * Time.deltaTime;
             left_dir_org = left_dir.position;
@@ -528,7 +570,7 @@ public class move_leg : MonoBehaviour
         else
         {
             left_control.position += left_control.up * speed * Time.deltaTime;
-            left_control.position += left_control.forward * -speed * 0.5f * Time.deltaTime;
+            left_control.position += left_control.forward * -speed * Time.deltaTime;
             //left_foot.position = left_control.position;
         }
 
@@ -538,6 +580,7 @@ public class move_leg : MonoBehaviour
             right_leg_in_front = true;
             left_control.position = left_foot.position;
             left_foot_org = left_control.position;
+            is_moving_backwards = false;
         }
     }// end left_leg_backwards
 
