@@ -99,9 +99,19 @@ public class move_leg : MonoBehaviour
         //move forward
         if (Input.GetKey(KeyCode.W))
         {
-            if (right_leg_in_front || is_moving_left_leg)
+            //if (!is_moving_right_leg) {
+            //    Debug.Log("moving: " + right_leg_in_front);
+            //}
+            //else
+            //{
+            //    //Debug.Log("stop: " + right_leg_in_front);
+            //}
+            
+            if ((right_leg_in_front || is_moving_left_leg) && !is_moving_right_leg)
             {
-                
+                right_leg_in_front = false;
+                is_moving_left_leg = true;
+
                 left_leg_forward();
                 
                 pelvis_dir.transform.position = right_dir.position + pelvis_height_adj;
@@ -112,12 +122,14 @@ public class move_leg : MonoBehaviour
 
                 pelvis.LookAt(pelvis_dir.transform);
 
-                is_moving_left_leg = true;
+                
 
             }
             else
             {
-                
+                right_leg_in_front = true;
+                is_moving_right_leg = true;
+
                 right_leg_forward();
                 
                 pelvis_dir.transform.position = left_dir.position + pelvis_height_adj;
@@ -128,7 +140,7 @@ public class move_leg : MonoBehaviour
 
                 pelvis.LookAt(pelvis_dir.transform);
 
-                is_moving_right_leg = true;
+                
 
             }
 
@@ -142,7 +154,7 @@ public class move_leg : MonoBehaviour
             //Debug.Log("left moving: " + is_moving_left_leg);
             //Debug.Log("right moving: " + is_moving_right_leg);
 
-            if (right_leg_in_front || is_moving_right_leg)
+            if ((right_leg_in_front || is_moving_right_leg) && !is_moving_left_leg)
             {
                 right_leg_backwards();
                 is_moving_right_leg = true;
