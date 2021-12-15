@@ -9,7 +9,7 @@ public class camera_follow : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        offset = new Vector3(0.0f, 0.0f, 20.0f);
+        offset = new Vector3(10.0f, 0.0f, 10.0f);
         target = GameObject.Find("Pelvis").transform;
     }
 
@@ -18,5 +18,6 @@ public class camera_follow : MonoBehaviour
     {
         //https://answers.unity.com/questions/1482210/how-to-make-an-object-always-in-front-of-the-ovrpl.html
         transform.position = target.position + offset;
+        transform.LookAt(target);
     }
 }

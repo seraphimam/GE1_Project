@@ -45,7 +45,9 @@ public class move_leg : MonoBehaviour
     public Vector3 right_foot_org;
     public Vector3 left_foot_org;
 
-    public float knee_leg_dist;
+    public float knee_foot_dist;
+    public float leg_dist;
+    public float leg_dir_dist;
 
     // Start is called before the first frame update
     void Start()
@@ -64,7 +66,7 @@ public class move_leg : MonoBehaviour
 
         pelvis = GameObject.Find("Pelvis").transform;
         pelvis_dir = new GameObject();
-        pelvis_height_adj = new Vector3(0f, 1.5f, 0f);
+        pelvis_height_adj = new Vector3(0f, 1.0f, 0f);
 
         right_leg_in_front = false;
 
@@ -85,13 +87,17 @@ public class move_leg : MonoBehaviour
         right_foot_org = right_control.position;
         left_foot_org = left_control.position;
 
-        knee_leg_dist = (right_knee.position - right_foot.position).magnitude;
+        knee_foot_dist = (right_knee.position - right_foot.position).magnitude;
+        leg_dir_dist = (right_leg.position - right_dir.position).magnitude;
+        leg_dist = (right_leg.position - left_leg.position).magnitude;
     }
 
     // Update is called once per frame
     void Update()
     {
         move();
+
+        //dist_correction();
     }
 
     void move()
@@ -315,8 +321,8 @@ public class move_leg : MonoBehaviour
     {
         float dist = (right_foot.position - right_foot_org).magnitude;
         //Debug.Log("dist: " + dist);
-        //Debug.Log("knee dist: " + knee_leg_dist);
-        if(dist > knee_leg_dist / 3.0f)
+        //Debug.Log("knee dist: " + knee_foot_dist);
+        if(dist > knee_foot_dist / 3.0f)
         {
             right_control.position += right_control.up * -speed * Time.deltaTime;
             right_control.position += right_control.forward * -speed * Time.deltaTime;
@@ -353,8 +359,8 @@ public class move_leg : MonoBehaviour
     {
         float dist = (left_foot.position - left_foot_org).magnitude;
         //Debug.Log("dist: " + dist);
-        //Debug.Log("knee dist: " + knee_leg_dist);
-        if (dist > knee_leg_dist / 3.0f)
+        //Debug.Log("knee dist: " + knee_foot_dist);
+        if (dist > knee_foot_dist / 3.0f)
         {
             left_control.position += left_control.up * -speed * Time.deltaTime;
             left_control.position += left_control.forward * -speed * Time.deltaTime;
@@ -412,4 +418,77 @@ public class move_leg : MonoBehaviour
         }
 
     }//end pelvis_follow()
+
+    //void dist_correction()
+    //{
+    //    //if legs are not at same distance
+    //    if((right_leg.position - left_leg.position).magnitude != leg_dist)
+    //    {
+    //        for (int i = 0; i < 10; i++)
+    //        {
+    //            //legs too far apart
+    //            if ((right_leg.position - left_leg.position).magnitude > leg_dist)
+    //            {
+    //                if (!is_moving_left_leg)
+    //                {
+    //                    right_leg.position = Vector3.MoveTowards(right_leg.position, left_leg.position, 0.2f);
+    //                }
+    //                else if (!is_moving_right_leg)
+    //                {
+    //                    left_leg.position = Vector3.MoveTowards(left_leg.position, right_leg.position, 0.2f);
+    //                }
+    //            }
+    //            else
+    //            {
+    //                if (!is_moving_left_leg)
+    //                {
+    //                    right_leg.LookAt(left_leg);
+    //                    right_leg.Rotate(0, 180, 0);
+    //                    right_leg.position += right_leg.forward * speed * 0.1f * Time.deltaTime;
+    //                }
+    //                else if (!is_moving_right_leg)
+    //                {
+    //                    left_leg.LookAt(left_leg);
+    //                    left_leg.Rotate(0, 180, 0);
+    //                    left_leg.position += left_leg.forward * speed * 0.1f * Time.deltaTime;
+    //                }
+    //            }
+    //        }
+    //    }
+
+    //    //if right leg and dir not at same distance as at start
+    //    if ((right_leg.position - right_dir.position).magnitude != leg_dir_dist)
+    //    {
+    //        for (int i = 0; i < 10; i++)
+    //        {
+    //            if ((right_leg.position - right_dir.position).magnitude > leg_dir_dist)
+    //            {
+    //                right_dir.position += right_dir.forward * -speed * 0.1f * Time.deltaTime;
+    //            }
+
+    //            if ((right_leg.position - right_dir.position).magnitude < leg_dir_dist)
+    //            {
+    //                right_dir.position += right_dir.forward * speed * 0.1f * Time.deltaTime;
+    //            }
+    //        }  
+    //    }
+
+    //    //if left leg and dir not at same distance as at start
+    //    if ((left_leg.position - left_dir.position).magnitude != leg_dir_dist)
+    //    {
+    //        for (int i = 0; i < 10; i++)
+    //        {
+    //            if ((left_leg.position - left_dir.position).magnitude > leg_dir_dist)
+    //            {
+    //                left_dir.position += left_dir.forward * -speed * 0.1f * Time.deltaTime;
+    //            }
+
+    //            if ((left_leg.position - left_dir.position).magnitude < leg_dir_dist)
+    //            {
+    //                left_dir.position += left_dir.forward * speed * 0.1f * Time.deltaTime;
+    //            }
+    //        }
+    //    }
+
+    //}//end dist_correction()
 }
