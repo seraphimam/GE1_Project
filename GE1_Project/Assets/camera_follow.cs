@@ -41,7 +41,7 @@ public class camera_follow : MonoBehaviour
         }
 
         //https://answers.unity.com/questions/1482210/how-to-make-an-object-always-in-front-of-the-ovrpl.html
-        transform.position = target.position + offset;
+        transform.position = target.forward + offset;
         transform.LookAt(target);
     }
 }

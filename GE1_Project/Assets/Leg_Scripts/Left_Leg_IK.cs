@@ -10,7 +10,7 @@ public class Left_Leg_IK : MonoBehaviour
 
     public float delta = 0.001f;
 
-    public float backwards_Str = 1f;
+    //public float backwards_Str = 1f;
 
     public Transform[] bones; //each bone of leg
     public float[] bone_length; //length of each bone
