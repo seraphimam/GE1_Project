@@ -30,7 +30,9 @@ public class move_leg : MonoBehaviour
     public bool left_foot_down;
 
     public bool is_turning_left;
+    public bool fin_left;
     public bool is_turning_right;
+    public bool fin_right;
 
     public Transform right_leg;
     public Transform right_knee;
@@ -93,7 +95,9 @@ public class move_leg : MonoBehaviour
         is_moving_left_leg = false;
 
         is_turning_right = false;
+        fin_right = false;
         is_turning_left = false;
+        fin_left = false;
 
         right_dir_org = right_dir.position;
         left_dir_org = left_dir.position;
@@ -123,8 +127,9 @@ public class move_leg : MonoBehaviour
         {
             if (is_turning_left)
             {
-                if (Input.GetKeyUp(KeyCode.A) || Mathf.Abs(Mathf.Abs(left_leg.rotation.y) - Mathf.Abs(init_rotation)) >= 30.0f)
+                if (Input.GetKeyUp(KeyCode.A) || Mathf.Abs(Mathf.Abs(left_leg.rotation.y) - Mathf.Abs(init_rotation)) >= 30.0f || fin_left)
                 {
+                    fin_left = true;
                     finish_left_turn();
                 }
                 else
@@ -493,13 +498,40 @@ public class move_leg : MonoBehaviour
 
     void finish_left_turn()
     {
-        is_turning_left = false;
+        Debug.Log("finishing left turn");
 
-        left_dir.parent = null;
-        right_dir.parent = null;
+        if (is_turning_left)
+        {
+            is_turning_left = false;
 
-        left_control.parent = null;
-        right_control.parent = null;
+            left_dir.parent = null;
+            right_dir.parent = null;
+
+            left_control.parent = null;
+            right_control.parent = null;
+        }
+
+        float angle = Vector3.SignedAngle(right_leg.position - left_leg.position, left_leg.forward, Vector3.up);
+
+        if(Mathf.Abs(angle) >= 89.8 && Mathf.Abs(angle) <= 90.2)
+        {
+            //right_foot_down = true;
+            //right_control.position += right_control.forward * -speed * Time.deltaTime;
+            right_control.position += right_control.up * -speed * Time.deltaTime;
+        }
+        else
+        {
+            if((right_knee.position - right_dir.position).sqrMagnitude <= 0.25)
+            {
+                right_leg.position += right_leg.forward * speed * Time.deltaTime;
+                right_dir.position += right_dir.forward * speed * Time.deltaTime;
+            }
+            else
+            {
+                right_control.position += right_control.forward * speed * Time.deltaTime;
+                right_control.position += right_control.up * speed * Time.deltaTime;
+            }
+        }
     }
 
     //void dist_correction()
