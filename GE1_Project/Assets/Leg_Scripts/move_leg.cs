@@ -49,6 +49,8 @@ public class move_leg : MonoBehaviour
     public float leg_dist;
     public float leg_dir_dist;
 
+    public 
+
     // Start is called before the first frame update
     void Start()
     {
@@ -134,7 +136,7 @@ public class move_leg : MonoBehaviour
         {
             //Debug.Log("left moving: " + is_moving_left_leg);
             //Debug.Log("right moving: " + is_moving_right_leg);
-            Debug.Log("right left front: " + right_leg_in_front);
+            //Debug.Log("right left front: " + right_leg_in_front);
 
             if ((right_leg_in_front || is_moving_right_leg) && !is_moving_left_leg)
             {
@@ -148,13 +150,28 @@ public class move_leg : MonoBehaviour
                 left_leg_backwards();
                 
             }
-            //right_control.position += right_control.forward * -speed * Time.deltaTime;
-            //right_control.position += right_control.up * -speed * Time.deltaTime;
         }//end move backwards if
 
         if (Input.GetKey(KeyCode.A))
         {
-            right_control.position += right_control.right * -speed * Time.deltaTime;
+            if (!is_moving_right_leg && !is_moving_left_leg)
+            {
+                
+                turn_left();
+
+            }
+            else
+            {
+                if (is_moving_right_leg)
+                {
+                    right_leg_backwards();
+                }
+                else if (is_moving_left_leg)
+                {
+                    left_leg_backwards();
+                }
+                
+            }
         }
 
         if (Input.GetKey(KeyCode.D))
@@ -418,6 +435,12 @@ public class move_leg : MonoBehaviour
         }
 
     }//end pelvis_follow()
+
+    //turn left
+    void turn_left()
+    {
+        left_leg.Rotate(0, speed * Time.deltaTime, 0);
+    }
 
     //void dist_correction()
     //{

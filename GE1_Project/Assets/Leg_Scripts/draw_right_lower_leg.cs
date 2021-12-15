@@ -28,7 +28,7 @@ public class draw_right_lower_leg : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        knee_bone.transform.position = knee.position;
+        //knee_bone.transform.position = knee.position;
         mid = knee.position - foot.position;
         knee_bone.transform.position = knee.position - (mid / 2.0f);
         knee_bone.transform.LookAt(foot);
